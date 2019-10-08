@@ -18,6 +18,9 @@ class TariffsRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Tariffs::class);
     }
+    public function what(){
+        
+    }
 
     // /**
     //  * @return Tariffs[] Returns an array of Tariffs objects

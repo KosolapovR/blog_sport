@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('/css/registration.css') }}" rel="stylesheet">
+{% endblock %}
+
+            
+
+{% block body %}
+    
+ <div class="container">
+  <div class="flex-container">
+    <div class="row full">
+    <div class="col-md-12">
+      <div class="form-container">
+                <div class="form-container-in">
+        </div>
+        <div class="log-container">
+          <img id="logo" src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Logo.png" alt="">
+          <div class="para">
+            <p class="lead mg">Join the best website, it's free, the github logo is there only because it's open source</p>
+          </div>
+      </div>
+        
+        <div class="row">
+          
+          <div class="col-md-6">
+            <h3 class="lead-text"> Join Us with social media </h3>
+              <div id="social-platforms">
+                <div class="media-container">
+                  <a class="btnn btnn-icon btnn-facebook" href="#"><i class="fa fa-facebook">                           </i><span>Facebook</span></a>
+                </div>
+                <div class="media-container">
+                   <a class="btnn btnn-icon btnn-google" href="#"><i class="fa fa-google">
+              </i><span>Google+</span></a>
+                </div>
+              </div>
+          </div>
+            
+          <div class="left-divider"></div>
+          <div class="col-md-6">
+            
+                {{form_start(form) }}
+           <div class="form-group">
+           {{ form_row(form.name, { 'attr': {'id': 'fname', 'class': 'form-control'} }) }}
+            </div>
+           <div class="form-group">
+          {{ form_row(form.surname, { 'label' : 'Last Name', 'attr': {'id': 'lname', 'class': 'form-control'} }) }}
+            </div>
+        <div class="form-group">
+          {{ form_row(form.email, { 'attr': {'id': 'email', 'class': 'form-control'} }) }}
+        </div>
+          <div class="form-group">
+          {{ form_row(form.password, { 'attr': {'id': 'password', 'class': 'form-control'} }) }}
+        </div>
+          <div class="form-group">
+             <input type="submit" value="submit" class="btn-primary btnn form-submit"></input>
+          </div>
+                <a href="{{ path('main') }}">На главную</a>
+                {{form_end(form) }}
+    
+          </div>
+        </div>
+                
+        </div>
+    </div>
+  </div>
+  </div>
+  
+</div>
+    
+{% endblock %}

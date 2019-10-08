@@ -5,58 +5,45 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
-use App\Entity\Brand;
-use App\Form\FirstFormType;
+use App\Entity\User;
 
 class MainController extends AbstractController
 {
-    
     /**
-     * @Route("/", name="index")
+     * @Route("/", name="main")
      */
-    public function index(Request $request)
+    public function index()
     {
-        $entityManager = $this->getDoctrine()->getManager();
-        $repository = $this->getDoctrine()->getRepository(Brand::class);
-       
-        $brand = new Brand();
-        $form = $this->createForm(FirstFormType::class, $brand);
+        return $this->render('main/index.html.twig', [
+            'controller_name' => 'MainController',
+        ]);
+    }
+
+    /**
+     * @Route("/registration", name="registration")
+     */
+    public function registration(Request $request, UserPasswordEncoderInterface $encoder)
+    {
+        
+        $user = new User();
+        $form = $this->createForm(\App\Form\RegistrationType::class, $user);
         $form->handleRequest($request);
-
-        $saved = false;
-
-        if( $form->isSubmitted() && $form->isValid()){
-            $data = $form->getData();
-            $entityManager->persist($data);
-            $entityManager->flush(); 
-            $saved = true;
-            return $this->redirectToRoute('index', array(), 301);
+        if($form->isSubmitted() && $form->isValid()){
+           $em = $this->getDoctrine()->getManager();
+           $user->setCreatedAt(new \DateTime());
+           $user->setRoles(['ROLE_USER']);
+           $user->setPassword($encoder->encodePassword($user, $user->getPassword()));
+           $em->persist($user);
+           $em->flush();
+           return $this->redirectToRoute('main');
         }
         
-        $brands = $repository->findAll();
-        $response = new Response($this->render('main/index.html.twig', [
+        
+        return $this->render('registration/registration.html.twig', [
             'controller_name' => 'MainController',
-            'form' => $form->createView(),
-            'saved' => $saved,
-            'brand_id' => $brand->getId(),
-            'brands' => $brands,
-        ]));
-        $response->headers->set('Location', 'https://vk.com/artist/sickpuppies');
-        
-        return $response;
-        
-    }
-    /**
-     * @Route("/remove/{brand}", name="remove_brand")
-     */
-    public function RemoveBrand(Brand $brand, Request $request)
-    {
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($brand);
-        $em->flush();
-
-        return $this->redirectToRoute('index');
+            'form' => $form->createView()
+        ]);
     }
 }
