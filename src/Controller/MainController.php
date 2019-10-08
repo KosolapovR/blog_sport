@@ -19,9 +19,11 @@ class MainController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $posts = $em->getRepository(Post::class)->findAll(); 
-        $rand = array_rand($posts);
-        $post = $posts[$rand];
-        $comments = $em->getRepository(Comment::class)->findByPostId($post->getId());
+        if(!empty($posts)){
+            $rand = array_rand($posts);
+            $post = $posts[$rand];
+            $comments = $em->getRepository(Comment::class)->findByPostId($post->getId());
+        }
         //dd($comments);
         
         return $this->render('main/index.html.twig', [

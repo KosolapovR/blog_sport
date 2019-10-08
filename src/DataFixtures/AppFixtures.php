@@ -48,7 +48,7 @@ class AppFixtures extends Fixture
             for($i = 0; $i < 20; $i++){
                 $post = new Post();
                 $post->setAuthor(($authors[array_rand($authors)])->getName());
-                $post->setText($this->faker->realText($maxNbChars = 200, $indexSize = 2));
+                $post->setText($this->faker->realText($maxNbChars = 1500, $indexSize = 2));
                 $post->setTitle($this->faker->sentence($nbWords = 3, $variableNbWords = true));
                 $post->setCreatedAt($this->faker->dateTimeThisYear);
                 $manager->persist($post);
@@ -66,7 +66,7 @@ class AppFixtures extends Fixture
                 $comment = new Comment();
                 $comment->setAuthor(($authors[array_rand($authors)])->getName());
                 $comment->setCreatedAt($this->faker->dateTimeThisYear);
-                $comment->setText($this->faker->realText($maxNbChars = 20, $indexSize = 2));
+                $comment->setText($this->faker->realText($maxNbChars = 200, $indexSize = 2));
                 $comment->setPost($post);
                 $manager->persist($comment);
              }

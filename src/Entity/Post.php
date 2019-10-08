@@ -29,7 +29,7 @@ class Post
     private $title;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="blob")
      */
     private $text;
 
@@ -77,9 +77,9 @@ class Post
         return $this;
     }
 
-    public function getText(): ?string
+    public function getText()
     {
-        return $this->text;
+        return stream_get_contents($this->text);
     }
 
     public function setText(string $text): self
