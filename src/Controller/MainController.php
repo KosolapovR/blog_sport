@@ -6,8 +6,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-
+use App\Entity\Comment;
 use App\Entity\User;
+use App\Entity\Post;
 
 class MainController extends AbstractController
 {
@@ -16,8 +17,17 @@ class MainController extends AbstractController
      */
     public function index()
     {
+        $em = $this->getDoctrine()->getManager();
+        $posts = $em->getRepository(Post::class)->findAll(); 
+        $rand = array_rand($posts);
+        $post = $posts[$rand];
+        $comments = $em->getRepository(Comment::class)->findByPostId($post->getId());
+        //dd($comments);
+        
         return $this->render('main/index.html.twig', [
             'controller_name' => 'MainController',
+            'post' => $post,
+            'comments' => $comments,
         ]);
     }
 

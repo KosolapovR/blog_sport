@@ -4,69 +4,73 @@ namespace App\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
-use App\Entity\Cities;
-use App\Entity\Tariffs;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use App\Entity\Post;
+use App\Entity\User;
+use App\Entity\Comment;
 
 class AppFixtures extends Fixture
 {
-    private $cities_buff = ['Санкт-Петербург', 'Выборг', 'Волхов', 'Тосно', 'Бокситогорск'];
-    private $tariffs_buff = ['optimum', 'maxi', 'min'];
     private $faker;
-    private $manager;
-    public function __construct() {
+    private $encoder;
+    
+    public function __construct(UserPasswordEncoderInterface $encoder) {
+        $this->encoder = $encoder;
         $this->faker = \Faker\Factory::create();
     }
-
     public function load(ObjectManager $manager)
     {
-        //$this->loadCities($manager);
-        //$this->loadTariffs($manager);
-        //$this->loadAddCitiesIntoTariffs($manager);
+        $this->loadUser($manager);
+        $this->loadPost($manager);
+        $this->loadComment($manager);
     }
-    private function loadCities(ObjectManager $manager){
-        for($i = 0; $i < 5; $i++){
-            $city = new Cities();
-            $city->setCity($this->faker->unique()->city);
-            //$this->setReference('city', $city);
-            $manager->persist($city);
+    private function loadUser(ObjectManager $manager){
+        $users = $manager->getRepository(User::class)->findAll();
+        if(count($users) < 19){
+            for($i = 0; $i < 20; $i++){
+                $user = new User();
+                $user->setEmail($this->faker->email);
+                $user->setName($this->faker->firstName);
+                $user->setSurname($this->faker->lastName);
+                $user->setPassword($this->encoder->encodePassword($user, $this->faker->password));
+                $user->setRoles(['ROLE_USER']);
+                $user->setVerified(false);
+                $user->setCreatedAt($this->faker->dateTimeThisYear);
+                $manager->persist($user);
+            }
+            $manager->flush();
         }
-        $manager->flush();
     }
-    private function loadTariffs(ObjectManager $manager)    {
-        for($i = 0; $i < 3; $i++){
-            $tariff = new Tariffs();
-            
-            $tariff->setName($this->tariffs_buff[$i]);
-            switch ($i){
-                case 0:
-                    $tariff->setPrice(450);
-                break;
-                case 1:
-                    $tariff->setPrice(650);
-                break;
-                case 2:
-                    $tariff->setPrice(350);
-                break;
-            }     
-            $tariff->setCreatedAt($this->faker->dateTime);
-            //$this->setReference('tariff', $tariff);
-           
-            $manager->persist($tariff);
-         
+    private function loadPost(ObjectManager $manager){
+        $posts = $manager->getRepository(Post::class)->findAll();
+        $authors = $manager->getRepository(User::class)->findAll();
+        if(count($posts) < 19){
+            for($i = 0; $i < 20; $i++){
+                $post = new Post();
+                $post->setAuthor(($authors[array_rand($authors)])->getName());
+                $post->setText($this->faker->realText($maxNbChars = 200, $indexSize = 2));
+                $post->setTitle($this->faker->sentence($nbWords = 3, $variableNbWords = true));
+                $post->setCreatedAt($this->faker->dateTimeThisYear);
+                $manager->persist($post);
+            }
+            $manager->flush();
         }
-        $manager->flush();
-        
-        
     }
-    
-    public function getOrder(){
-        return 1;
+    private function loadComment(ObjectManager $manager){
+        $authors = $manager->getRepository(User::class)->findAll();
+        $comments = $manager->getRepository(Comment::class)->findAll();
+        if(count($comments) < 19){
+            for($i = 0; $i < 20; $i++){
+                $posts = $manager->getRepository(Post::class)->findAll();
+                $post = $posts[array_rand($posts)];
+                $comment = new Comment();
+                $comment->setAuthor(($authors[array_rand($authors)])->getName());
+                $comment->setCreatedAt($this->faker->dateTimeThisYear);
+                $comment->setText($this->faker->realText($maxNbChars = 20, $indexSize = 2));
+                $comment->setPost($post);
+                $manager->persist($comment);
+             }
+             $manager->flush();
+        }
     }
-
-//    private function loadAddCitiesIntoTariffs(ObjectManager $manager){
-//         //$tariff = $manager->getRepository(Tariffs::class)->findBy(['id' => 9]);
-//         //$city = $manager->getRepository(Cities::class)->findBy(['id' => 507]);
-//         //dd($tariff[0]);
-//        
-//    }
 }
